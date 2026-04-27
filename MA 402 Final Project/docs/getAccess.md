@@ -22,14 +22,70 @@ While a solver treats $X$ as a single mathematical entity, the physical residual
 
 ### 5. Minimal Working Example (MWE)
 ```python
-# Unpack the design (w), state (u), and adjoint (lmbda) variables
-# This uses the context manager logic found in DMComposite.pyx
-with packer.getAccess(X) as (w, u, lmbda):
-    # Convert sub-vectors to arrays for mathematical operations
-    w_arr = da_design.getVecArray(w)
-    u_arr = da_state.getVecArray(u)
+from petsc4py import PETSc
+import sys
+
+def main():
+    """
+    Minimal Working Example (MWE) for getAccess
+    This script demonstrates how to bundle multiple physics fields 
+    (Design, State, Adjoint) and access them using a context manager.
+    """
+    # 1. Initialize PETSc and the communicator
+    comm = PETSc.COMM_WORLD
     
-    # Example: Calculate a coupled interaction
-    # residual = u_arr[i] * w_arr[i]
-    pass
-# RestoreAccess is called automatically here
+    # 2. Create the individual components (DMs)
+    # We create three 1D grids for our different variables
+    da_design = PETSc.DMDA().create(dim=1, sizes=[10], comm=comm)
+    da_design.setUp()
+    
+    da_state = PETSc.DMDA().create(dim=1, sizes=[10], comm=comm)
+    da_state.setUp()
+    
+    da_adjoint = PETSc.DMDA().create(dim=1, sizes=[10], comm=comm)
+    da_adjoint.setUp()
+
+    # 3. Create the Packer (DMComposite)
+    # This acts as the container for the design (w), state (u), and adjoint (lmbda)
+    packer = PETSc.DMComposite().create(comm)
+    packer.addDM(da_design)
+    packer.addDM(da_state)
+    packer.addDM(da_adjoint)
+    
+    # 4. Create the global vector for the whole system and fill it with dummy data
+    X = packer.createGlobalVec()
+    X.set(5.0)  # Setting all values to 5.0 for this example
+
+    PETSc.Sys.Print("--- Starting getAccess MWE ---")
+
+    # 5. Use the Context Manager to unpack the variables
+    # This matches the logic found in DMComposite.pyx
+    with packer.getAccess(X) as (w, u, lmbda):
+        
+        # 6. Convert the sub-vectors to NumPy-like arrays
+        # This allows for easy mathematical operations
+        w_arr = da_design.getVecArray(w)
+        u_arr = da_state.getVecArray(u)
+        l_arr = da_adjoint.getVecArray(lmbda)
+        
+        # 7. Perform a coupled interaction (Example Math)
+        # Let's say we want to check node 0
+        node = 0
+        result = w_arr[node] * u_arr[node] + l_arr[node]
+        
+        PETSc.Sys.Print(f"Design value at node {node}: {w_arr[node]}")
+        PETSc.Sys.Print(f"State value at node {node}: {u_arr[node]}")
+        PETSc.Sys.Print(f"Calculated interaction (w*u + lmbda): {result}")
+
+    # Note: RestoreAccess is called AUTOMATICALLY when the 'with' block ends.
+    PETSc.Sys.Print("--- Access successfully restored ---")
+
+    # 8. Cleanup memory
+    X.destroy()
+    da_design.destroy()
+    da_state.destroy()
+    da_adjoint.destroy()
+    packer.destroy()
+
+if __name__ == "__main__":
+    main()
