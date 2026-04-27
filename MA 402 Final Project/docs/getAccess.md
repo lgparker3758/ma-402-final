@@ -1,10 +1,10 @@
 # Function Documentation: `PETSc.DMComposite.getAccess`
 
 ### 1. Description
-The `getAccess` method provides a Pythonic context manager for "unpacking" a composite global vector into its individual component vectors. It is specifically used with `DMComposite` (the "packer") when a simulation involves multiple coupled variables—such as state variables, design variables, and multipliers—that are stored together in a single contiguous memory block.
+The `getAccess` method provides a way in Python to resolve a composite global vector into its individual component vectors. It is specifically used with `DMComposite` when a simulation involves multiple dependent variables like state variables, design variables, and multipliers, that are then stored together in a single uninterrupted memory block.
 
 ### 2. Parameters and Return Types
-* **gvec** (*PETSc.Vec*): The large, coupled global vector containing all component variables.
+* **gvec** (*PETSc.Vec*): The large, dependent global vector containing all component variables.
 * **locs** (*Sequence[int]*, optional): Indices of specific vectors wanted; defaults to `None` to retrieve all vectors.
 * **Returns**: A context manager that, when used with the `with` statement, yields a **tuple of PETSc.Vec** objects.
 
@@ -18,7 +18,7 @@ While a solver treats $X$ as a single mathematical entity, the physical residual
 * **C Source:** [`src/dm/impls/composite/pack.c#L1250`](https://gitlab.com/petsc/petsc/-/blob/main/src/dm/impls/composite/pack.c#L182)
 * **The Cython Bridge:** [`src/binding/petsc4py/src/petsc4py/PETSc/DMComposite.pyx#L219`](https://gitlab.com/petsc/petsc/-/blob/main/src/binding/petsc4py/src/petsc4py/PETSc/DMComposite.pyx#L219)
 
-**Technical Insight:** This is a sophisticated implementation of a Python **Context Manager** (PEP 343). The public `getAccess` method returns a specialized `_DMComposite_access` object. The `__enter__` method of this object invokes the C routine `DMCompositeGetAccess()`, while the `__exit__` method automatically invokes `DMCompositeRestoreAccess()`. This ensures that even if an error occurs during residual assembly, the sub-vectors are safely "restored" to PETSc, preventing memory corruption or deadlocks.
+**Technical Insight:** This is a sophisticated implementation of a Python **Context Manager** (PEP 343). The public `getAccess` method returns a specialized `_DMComposite_access` object. The `__enter__` method of this object invokes the C routine `DMCompositeGetAccess()`, while the `__exit__` method automatically invokes `DMCompositeRestoreAccess()`. This ensures that even if an error occurs during residual assembly, the sub-vectors are safely restored to PETSc, preventing memory corruption.
 
 ### 5. Minimal Working Example (MWE)
 ```python
