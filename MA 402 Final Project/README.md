@@ -12,12 +12,12 @@ This project uses multiple processors to to optimize a physical setup. It balanc
 * **Optimized Memory:** Uses context managers for automatic memory restoration of PETSc vectors.
 
 ## Project Structure
-* `main_script.py`: The core PETSc solver and optimization logic.
-* `visualization.ipynb`: Jupyter Notebook for analyzing solver convergence and results.
+* [`MA402_Final.py`](https://github.com/lgparker3758/MA-402-Final/blob/main/MA%20402%20Final%20Project/MA402_Final.py): The core PETSc solver and optimization logic.
+* [`MA402_visualizations.ipynb`](https://github.com/lgparker3758/MA-402-Final/blob/main/MA%20402%20Final%20Project/MA402_visualizations.ipynb): Jupyter Notebook for analyzing solver convergence and results.
 * `docs/`: Deep-dive technical documentation for PETSc methods.
-    * `getVecArray.md`: Handling local vector data.
-    * `globalToLocal.md`: Managing ghost point synchronization.
-    * `getAccess.md`: Using DMComposite context managers.
+    * [`getVecArray.md`](https://github.com/lgparker3758/MA-402-Final/blob/main/MA%20402%20Final%20Project/docs/getVecArray.md): Handling local vector data.
+    * [`globalToLocal.md`](https://github.com/lgparker3758/MA-402-Final/blob/main/MA%20402%20Final%20Project/docs/globalToLocal.md): Managing ghost point synchronization.
+    * [`getAccess.md`](https://github.com/lgparker3758/MA-402-Final/blob/main/MA%20402%20Final%20Project/docs/getAccess.md): Using DMComposite context managers.
  
 ## AI Translation Experience
 I used Gemini to help translate C code into Python code. It was an "ok" experience for someone who has never worked with C code and isn't extremely confident with Python. I felt that Gemini was better at writing code than ChatGPT, but it still created a lot of errors. The biggest problem I had was with trying to get VS Code and Python to work correctly. I consistently had issues with path directory, being told pip wasn't installed, being told ipy kernel wasn't installed, and more. 
@@ -29,3 +29,4 @@ Ensure you have `petsc4py` installed in your WSL/Linux environment.
 To run the solver in serial:
 ```bash
 python3 MA402_Final.py
+
