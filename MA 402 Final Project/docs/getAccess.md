@@ -56,7 +56,7 @@ def main():
     X = packer.createGlobalVec()
     X.set(5.0)  # Setting all values to 5.0 for this example
 
-    PETSc.Sys.Print("--- Starting getAccess MWE ---")
+    PETSc.Sys.Print("Starting getAccess MWE")
 
     # 5. Use the Context Manager to unpack the variables
     # This matches the logic found in DMComposite.pyx
@@ -77,8 +77,8 @@ def main():
         PETSc.Sys.Print(f"State value at node {node}: {u_arr[node]}")
         PETSc.Sys.Print(f"Calculated interaction (w*u + lmbda): {result}")
 
-    # Note: RestoreAccess is called AUTOMATICALLY when the 'with' block ends.
-    PETSc.Sys.Print("--- Access successfully restored ---")
+    
+    PETSc.Sys.Print("Access successfully restored")
 
     # 8. Cleanup memory
     X.destroy()
