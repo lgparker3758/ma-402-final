@@ -25,8 +25,16 @@ $$\Delta u \approx \frac{u_{i+1,j} + u_{i-1,j} + u_{i,j+1} + u_{i,j-1} - 4u_{i,j
 
 ### 5. Minimal Working Example (MWE)
 ```python
-# Context: Evaluating a residual on a 2D structured grid
+from petsc4py import PETSc
+
+class SolverContext:
+    def __init__(self, da):
+        self.da = da
+
 def formFunction(snes, X, F, ctx):
+    """
+    The actual residual evaluation function.
+    """
     # 1. Scatter global solution to local vector (to get ghost points)
     localX = ctx.da.getLocalVec()
     ctx.da.globalToLocal(X, localX)
@@ -35,11 +43,31 @@ def formFunction(snes, X, F, ctx):
     x_arr = ctx.da.getVecArray(localX)
     f_arr = ctx.da.getVecArray(F)
 
-    # 3. Access data using grid indices (i, j)
-    # This matches the mathematical formulation u_{i,j}
+    # 3. Get the grid boundaries for this specific processor
+    (xs, xe), (ys, ye) = ctx.da.getRanges()
+
+    # 4. Access data using grid indices (i, j)
     for j in range(ys, ye):
         for i in range(xs, xe):
-            f_arr[i, j] = x_arr[i, j] - 1.0 # Simple example operation
+            # Mathematical formulation: u_{i,j} - 1.0 = 0
+            f_arr[i, j] = x_arr[i, j] - 1.0 
             
-    # 4. Clean up
+    # 5. Clean up local memory
     ctx.da.restoreLocalVec(localX)
+
+# Setup to run example
+comm = PETSc.COMM_WORLD
+da = PETSc.DMDA().create(dim=2, sizes=[5, 5], comm=comm)
+da.setUp()
+
+ctx = SolverContext(da)
+X = da.createGlobalVec()
+F = da.createGlobalVec()
+X.set(2.0) # Initial guess
+
+# Manually calling the function to test it
+formFunction(None, X, F, ctx)
+
+# If it works, F should now be 1.0 everywhere (2.0 - 1.0)
+if F.norm() == 5.0: # sqrt(sum of 1.0^2 for 25 points) = 5
+    print("MWE Success: Residual correctly evaluated!")
