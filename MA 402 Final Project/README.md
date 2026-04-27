@@ -3,7 +3,7 @@
 This project fnds a way to solve a complex, nonlinear differential 1D PDE-constrained optimization problem using **PETSc** and **petsc4py**. The solver uses a full-space approach to simultaneously solve for the design variable ($w$), state variable ($u$), and adjoint variable ($\lambda$). 
 
 ## Overview
-This project uses multiple processors to to optimize a physical setup. It balances getting to a specific goal while still following all rules of physics across a 1D/2D grid.
+This project uses multiple processors to to optimize a physical setup. It balances getting to a specific goal while still following all rules of physics across a coordinate system.
 
 ### Key Features
 * **Parallel Execution:** Scalable numerical operations via MPI.
