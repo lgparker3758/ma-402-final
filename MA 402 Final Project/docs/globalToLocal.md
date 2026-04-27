@@ -1,7 +1,7 @@
 # Function Documentation: `PETSc.DM.globalToLocal`
 
 ### 1. Description
-The `globalToLocal` method communicates data from a **global vector** (the non-overlapping representation of the solution) to a **local vector** (which includes "ghost points" or shadow values from neighboring processors). This synchronization is mandatory in parallel computing before any stencil-based computation (like finite differences) can be performed.
+The `globalToLocal` method communicates data from a **global vector** to a **local vector**. This communication is mandatory in parallel computing before any updation of array elements can occur.
 
 ### 2. Parameters and Return Types
 * **gvec** (*PETSc.Vec*): The input global vector containing the current solution state across all processors.
@@ -17,12 +17,11 @@ $$V_{local, k} = \mathcal{S}_k V_g$$
 where $\mathcal{S}_k$ is the operator that maps global degrees of freedom to the local memory space of processor $k$, including the required overlap. Without this call, boundary stencils would use zeroed or outdated data, resulting in incorrect physical residuals.
 
 ### 4. Source Code Archaeology
-* **C Header:** [`include/petscdm.h#L529`](https://gitlab.com/petsc/petsc/-/blob/main/include/petscdm.h#L529)
-* **C Source (Implementation):** [`src/dm/interface/dm.c#L2816`](https://gitlab.com/petsc/petsc/-/blob/main/src/dm/interface/dm.c#L2816)
-* **C Source (Wrapper):** [`src/dm/interface/dm.c#L2892`](https://gitlab.com/petsc/petsc/-/blob/main/src/dm/interface/dm.c#L2892)
+* **C Header:** [`include/petscdm.h#L134`](https://gitlab.com/petsc/petsc/-/blob/main/include/petscdm.h?ref_type=heads#L134)
+* **C Source:** [`src/dm/interface/dm.c#L2892`](https://gitlab.com/petsc/petsc/-/blob/main/src/dm/interface/dm.c#L2892)
 * **The Cython Bridge:** [`src/binding/petsc4py/src/petsc4py/PETSc/DM.pyx#L971`](https://gitlab.com/petsc/petsc/-/blob/main/src/binding/petsc4py/src/petsc4py/PETSc/DM.pyx#L971)
 
-**Technical Insight:** The Cython bridge uses the `CHKERR` macro to wrap the C function `DMGlobalToLocal`. This ensures that if the underlying MPI communication fails, a Python exception is raised. The bridge also "unpacks" the Python `Vec` objects to pass the raw C pointers (`gvec.vec`, `lvec.vec`) into the high-performance PETSc library.
+**Technical Insight:** The Cython bridge uses `CHKERR` to wrap the C function `DMGlobalToLocal`. This ensures that if the underlying MPI communication fails, a Python exception is raised. The bridge also resolve the Python `Vec` objects to pass the raw C pointers, which help interface with C style libraries, into the high-performance PETSc library.
 
 ### 5. Minimal Working Example (MWE)
 ```python
