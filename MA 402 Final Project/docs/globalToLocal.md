@@ -25,14 +25,32 @@ where $\mathcal{S}_k$ is the operator that maps global degrees of freedom to the
 
 ### 5. Minimal Working Example (MWE)
 ```python
-# Create vectors
-g_sol = da.createGlobalVec()
-l_sol = da.getLocalVec()
+from petsc4py import PETSc
 
-# Synchronize: Update ghost points from neighbors
-# This triggers the MPI communication found in dm.c
-da.globalToLocal(g_sol, l_sol)
+def main():
+    comm = PETSc.COMM_WORLD
+    # 1. Create a 1D DA
+    da = PETSc.DMDA().create(dim=1, sizes=[10], comm=comm, stencil_width=1)
+    da.setUp()
 
-# The local vector is now ready for stencil math
-u_arr = da.getVecArray(l_sol)
-# Accessing u_arr[i+1, j] is now safe across processor boundaries
+    g_sol = da.createGlobalVec()
+    l_sol = da.getLocalVec()
+    g_sol.set(1.0) 
+
+    # 2. Sync
+    da.globalToLocal(g_sol, l_sol)
+    u_arr = da.getVecArray(l_sol)
+
+    # 3. Get the range (Note the [0] at the end!)
+    (xs, xe) = da.getRanges()[0]
+
+    print(f"Processor {comm.getRank()} is handling indices from {xs} to {xe}")
+    
+    # Clean up
+    da.restoreLocalVec(l_sol)
+    g_sol.destroy()
+    l_sol.destroy()
+    da.destroy()
+
+if __name__ == "__main__":
+    main()
