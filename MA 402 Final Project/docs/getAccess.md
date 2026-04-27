@@ -18,7 +18,7 @@ While a solver treats $X$ as a single mathematical entity, the physical residual
 * **C Source:** [`src/dm/impls/composite/pack.c#L1250`](https://gitlab.com/petsc/petsc/-/blob/main/src/dm/impls/composite/pack.c#L182)
 * **The Cython Bridge:** [`src/binding/petsc4py/src/petsc4py/PETSc/DMComposite.pyx#L219`](https://gitlab.com/petsc/petsc/-/blob/main/src/binding/petsc4py/src/petsc4py/PETSc/DMComposite.pyx#L219)
 
-**Technical Insight:** This is a sophisticated implementation of a Python **Context Manager** (PEP 343). The public `getAccess` method returns a specialized `_DMComposite_access` object. The `__enter__` method of this object invokes the C routine `DMCompositeGetAccess()`, while the `__exit__` method automatically invokes `DMCompositeRestoreAccess()`. This ensures that even if an error occurs during residual assembly, the sub-vectors are safely restored to PETSc, preventing memory corruption.
+**Technical Insight:** This is an implementation of a Python **Context Manager**. The public `getAccess` method returns a specialized `_DMComposite_access` object. The `__enter__` method of this object invokes the C routine `DMCompositeGetAccess()`, while the `__exit__` method automatically invokes `DMCompositeRestoreAccess()`. This ensures that even if an error occurs, the sub-vectors are safely restored to PETSc, preventing memory corruption.
 
 ### 5. Minimal Working Example (MWE)
 ```python
