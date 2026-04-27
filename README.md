@@ -29,4 +29,4 @@ Ensure you have `petsc4py` installed in your WSL/Linux environment.
 ### Run the Solver
 To run the solver in serial:
 ```bash
-python3 MA402_FinalProject.py
+python3 MA402_Final.py
