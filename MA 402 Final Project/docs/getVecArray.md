@@ -1,7 +1,7 @@
 # Function Documentation: `PETSc.DMDA.getVecArray`
 
 ### 1. Description
-The `getVecArray` method provides a multi-dimensional, NumPy-compatible view of a PETSc Vector’s data. This is a critical utility for structured grids (DMDA), as it maps the flat memory layout of a PETSc `Vec` into a structured array that matches the grid's dimensions (1D, 2D, or 3D). This allows for intuitive indexing using grid coordinates rather than manual memory offsets.
+The `getVecArray` method provides a multi-dimensional view of a PETSc Vector’s data. This is a critical utility for DMDA which manages parallel structured Cartesian grids, as it maps the flat memory layout of a PETSc `Vec` into a structured array that matches the grid's dimensions (1D, 2D, or 3D). This allows for intuitive indexing using grid coordinates.
 
 ### 2. Parameters and Return Types
 * **vec** (*PETSc.Vec*): The vector to be accessed. 
@@ -21,7 +21,7 @@ $$\Delta u \approx \frac{u_{i+1,j} + u_{i-1,j} + u_{i,j+1} + u_{i,j-1} - 4u_{i,j
 ### 4. Source Code Archaeology
 * **C Header:** [`include/petscdmda.h`](https://gitlab.com/petsc/petsc/-/blob/main/include/petscdmda.h?ref_type=heads#L127)
 * **C Source:** [`src/dm/impls/da/dagetarray.c`](https://gitlab.com/petsc/petsc/-/blob/main/src/dm/impls/da/dagetarray.c?ref_type=heads#L43)
-* **The Cython Bridge:** This method is defined in `src/binding/petsc4py/src/petsc4py/PETSc/DMDA.pyx`. It acts as a high-level wrapper for the C routine `DMDAVecGetArray`. The bridge logic (specifically in `lpldmda.pxi`) handles the complexity of detecting the DMDA dimension and automatically selecting the correct C call (e.g., `DMDAVecGetArray2d`) before returning a NumPy-managed memory view to the user.
+* **The Cython Bridge:** [`src/binding/petsc4py/src/petsc4py/PETSc/DMDA.pyx`](https://gitlab.com/petsc/petsc/-/blob/main/src/binding/petsc4py/src/petsc4py/PETSc/DMDA.pyx?ref_type=heads#L723)This method is defined in `src/binding/petsc4py/src/petsc4py/PETSc/DMDA.pyx`. It acts as a high-level wrapper for the C routine `DMDAVecGetArray`. The bridge logic (specifically in `lpldmda.pxi`) handles the complexity of detecting the DMDA dimension and automatically selecting the correct C call (e.g., `DMDAVecGetArray2d`) before returning a NumPy-managed memory view to the user.
 
 ### 5. Minimal Working Example (MWE)
 ```python
