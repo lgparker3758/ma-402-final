@@ -10,7 +10,7 @@ The `getAccess` method provides a way in Python to resolve a composite global ve
 
 ### 3. Mathematical Context
 In multi-physics or constrained optimization, we often work with a "Block Vector" $X$. For a system with a design variable $w$, state $u$, and Lagrange multiplier $\lambda$, the vector is structured as:
-$$X = \begin{bmatrix} w \\ u \\ \lambda \end{bmatrix}$$
+$$X = [w, u, \lambda]^T$$
 While a solver treats $X$ as a single mathematical entity, the physical residuals and constraints are defined on the individual sub-components. `getAccess` provides the mapping that extracts $w, u,$ and $\lambda$ from the memory of $X$ without performing an expensive data copy. This allows for efficient, modular assembly of coupled equations.
 
 ### 4. Source Code Archaeology
